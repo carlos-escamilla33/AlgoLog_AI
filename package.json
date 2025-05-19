@@ -1,0 +1,20 @@
+{
+  "name": "leetcode_ai_assistant",
+  "version": "1.0.0",
+  "description": "An API for the leetcode_ai_assistant, using node, express, and postgreSQL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "seed:dev": "node --watch ./backend/db/db.js",
+    "seed": "node ./db/db.js",
+    "start:dev": "node --watch app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "pg": "^8.16.0"
+  }
+}
