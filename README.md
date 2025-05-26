@@ -16,13 +16,14 @@
 |-------------|--------------|--------------------------------------|
 | id          | SERIAL PK    | Unique journal ID                    |
 | creator_id  | INTEGER FK   | References users(id)                 |
+| is_public   | BOOLEAN false| User can set their journal to public or not|
 | title       | VARCHAR (255)| Title of the journal                 |
 | code        | TEXT         | code of the journal                  |
 | notes       | TEXT         | Content of the journal               |
 | created_at  | TIMESTAMPTZ  | When the journal was created         |
 | updated_at  | TIMESTAMPTZ  | When the journal was last updated    |
 
-###  GPT gpt_conversations
+###  gpt_conversations
 | Column      | Type         | Description                          |
 |-------------|--------------|--------------------------------------|
 | id          | SERIAL PK    | Unique GPT conversation ID           |
