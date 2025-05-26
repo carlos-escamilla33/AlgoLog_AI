@@ -6,7 +6,11 @@ async function dropTables() {
         console.log("Starting seed process...");
 
         // Drop all tables
-        await pool.query("DROP TABLE IF EXISTS users;");
+        await pool.query(`
+            DROP TABLE IF EXISTS users;
+            DROP TABLE IF EXISTS journal_problems;
+            DROP TABLE IF EXISTS gpt_conversations;
+            `);
 
         // Log tables were dropped
         console.log("Completed dropping tables...")
@@ -24,8 +28,24 @@ async function initializeTables() {
                 id SERIAL PRIMARY KEY,
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
-                created_at TIME NOT NULL now(),
-                updated_at TIME NOT NULL now()
+                created_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW()
+            );
+
+            CREATE TABLE journal_problems (
+                id SERIAL PRIMARY KEY,
+                creator_id INTEGER REFERENCES users(id),
+                is_public BOOLEAN DEFAULT false,
+                created_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW()
+            );
+
+            CREATE TABLE gpt_conversations (
+                id SERIAL PRIMARY KEY,
+                journal_id INTEGER REFERENCES journal_problems(id),
+                prompt TEXT,
+                response TEXT,
+                created_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW()
             );
         `);
         console.log("Finished intializing data!");
