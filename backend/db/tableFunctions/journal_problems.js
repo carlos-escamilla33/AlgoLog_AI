@@ -18,6 +18,21 @@ async function getAllJournalProblems() {
         const {rows} = await pool.query(`
             SELECT * FROM journal_problems;
         `);
+        return rows;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function updateJournalProblem({id, title, code, notes}) {
+    try {
+        const {rows: [journal]} = await pool.query(`
+            UPDATE journal_problems
+            SET title=$1, code=$2, notes=$3
+            WHERE id=$4
+            RETURNING *;
+        `, [title, code, notes, id]);
+        return journal;
     } catch (error) {
         throw error;
     }
@@ -25,5 +40,6 @@ async function getAllJournalProblems() {
 
 module.exports = {
     createJournalProblem,
+    getAllJournalProblems,
 
 }
