@@ -83,6 +83,7 @@ async function seed() {
         await initializeTables();
         // Create Users
         await createInitialUsers();
+        // Create journal
     } catch (error) {
         console.log("Seeding data failed!");
         throw error;

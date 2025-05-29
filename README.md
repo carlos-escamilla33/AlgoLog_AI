@@ -1,4 +1,4 @@
-# Leetcode_AI_Assistant
+# AlgoLog AI
 ## 📊 Database Schema
 
 ###  users
