@@ -28,16 +28,16 @@ async function initializeTables() {
                 id SERIAL PRIMARY KEY,
                 username VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
-                created_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW(),
-                updated_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW()
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
 
             CREATE TABLE journal_problems (
                 id SERIAL PRIMARY KEY,
                 creator_id INTEGER REFERENCES users(id),
                 is_public BOOLEAN DEFAULT false,
-                created_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW(),
-                updated_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW()
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
 
             CREATE TABLE gpt_conversations (
@@ -45,12 +45,32 @@ async function initializeTables() {
                 journal_id INTEGER REFERENCES journal_problems(id),
                 prompt TEXT,
                 response TEXT,
-                created_at TIMESTAMPTZ DEFAULT NOT NULL DEFAULT NOW()
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
         `);
         console.log("Finished intializing data!");
     } catch (error) {
         console.log("Error initializing tables!");
+        throw error;
+    }
+}
+
+async function createInitialUsers() {
+    console.log("Starting to create users...");
+    try {
+        const usersToCreate = [
+            {username:"riley", password:"riley1234"},
+            {username:"wade", password:"wade1234"},
+            {username:"luna", password:"luna1234"},
+        ];
+        const users = await Promise.all(usersToCreate.map(createUser));
+
+        console.log("Users created: ");
+        console.log(users);
+        console.log("Finished creating users!");
+
+    } catch (error) {
+        console.log(error);
         throw error;
     }
 }
@@ -61,6 +81,8 @@ async function seed() {
         await dropTables();
         // Init tables
         await initializeTables();
+        // Create Users
+        await createInitialUsers();
     } catch (error) {
         console.log("Seeding data failed!");
         throw error;

@@ -1,5 +1,5 @@
 const pool = require("./pool");
-const { seed } = require("./index");
+const { seed } = require("./populatedb.js");
 
 seed()
     .catch(console.error)
