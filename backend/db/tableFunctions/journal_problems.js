@@ -13,7 +13,17 @@ async function createJournalProblem({title, code, notes}) {
     }
 }
 
+async function getAllJournalProblems() {
+    try {
+        const {rows} = await pool.query(`
+            SELECT * FROM journal_problems;
+        `);
+    } catch (error) {
+        throw error;
+    }
+}
+
 module.exports = {
     createJournalProblem,
-    
+
 }
