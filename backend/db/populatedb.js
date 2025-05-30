@@ -100,7 +100,6 @@ async function seed() {
         // adding COMMIT transaction
         await client.query("COMMIT");
         console.log("✅ Seed completed successfully!");
-
     } catch (error) {
         await client.query("ROLLBACK");
         console.log('❌ Seeding failed, rolling back!');

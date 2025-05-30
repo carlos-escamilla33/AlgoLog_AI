@@ -24,7 +24,7 @@ async function createUser(userData, client) {
 
 async function getAllUsernames() {
     try {
-        const { rows } = await pool.query("SELECT * FROM leetcode_db");
+        const { rows } = await pool.query("SELECT * FROM users");
         return rows;
     } catch (error) {
         throw error;
