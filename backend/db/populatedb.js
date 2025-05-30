@@ -1,15 +1,15 @@
 const { createUser } = require("./");
-const { pool } = require("./index");
+const { pool } = require("./pool");
 
-async function dropTables() {
+async function dropTables(client) {
     try {
         console.log("Starting seed process...");
 
         // Drop all tables
-        await pool.query(`
-            DROP TABLE IF EXISTS users;
-            DROP TABLE IF EXISTS journal_problems;
+        await client.query(`
             DROP TABLE IF EXISTS gpt_conversations;
+            DROP TABLE IF EXISTS journal_problems;
+            DROP TABLE IF EXISTS users;
             `);
 
         // Log tables were dropped
@@ -20,13 +20,14 @@ async function dropTables() {
     }
 }
 
-async function initializeTables() {
+async function initializeTables(client) {
     try {
         console.log("Initializing tables...");
-        await pool.query(`
+        await client.query(`
             CREATE TABLE users (
                 id SERIAL PRIMARY KEY,
                 username VARCHAR(255) UNIQUE NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
                 password VARCHAR(255) NOT NULL,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -34,7 +35,12 @@ async function initializeTables() {
 
             CREATE TABLE journal_problems (
                 id SERIAL PRIMARY KEY,
-                creator_id INTEGER REFERENCES users(id),
+                creator_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+                title VARCHAR(500) NOT NULL,
+                code TEXT,
+                notes TEXT,
+                difficulty VARCHAR(20) CHECK (difficulty IN('Easy', 'Medium', 'Hard')),
+                tags TEXT[],
                 is_public BOOLEAN DEFAULT false,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -42,7 +48,7 @@ async function initializeTables() {
 
             CREATE TABLE gpt_conversations (
                 id SERIAL PRIMARY KEY,
-                journal_id INTEGER REFERENCES journal_problems(id),
+                journal_id INTEGER REFERENCES journal_problems(id) ON DELETE CASCADE,
                 prompt TEXT,
                 response TEXT,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -55,7 +61,7 @@ async function initializeTables() {
     }
 }
 
-async function createInitialUsers() {
+async function createInitialUsers(client) {
     console.log("Starting to create users...");
     try {
         const usersToCreate = [
@@ -63,7 +69,11 @@ async function createInitialUsers() {
             {username:"wade", password:"wade1234"},
             {username:"luna", password:"luna1234"},
         ];
-        const users = await Promise.all(usersToCreate.map(createUser));
+        const users = [];
+        for (const userData of usersToCreate) {
+            const user = await createUser(userData, client);
+            users.push(user);
+        }
 
         console.log("Users created: ");
         console.log(users);
@@ -76,17 +86,28 @@ async function createInitialUsers() {
 }
 
 async function seed() {
+    const client = await pool.connect();
     try {
+        // adding BEGIN transaction
+        await client.query("BEGIN");
         // Dropping tables
-        await dropTables();
+        await dropTables(client);
         // Init tables
-        await initializeTables();
+        await initializeTables(client);
         // Create Users
-        await createInitialUsers();
+        const users = await createInitialUsers(client);
         // Create journal
+        // adding COMMIT transaction
+        await client.query("COMMIT");
+        console.log("✅ Seed completed successfully!");
+
     } catch (error) {
-        console.log("Seeding data failed!");
+        await client.query("ROLLBACK");
+        console.log('❌ Seeding failed, rolling back!');
+        console.error(error);
         throw error;
+    } finally {
+        client.release();
     }
 }
 

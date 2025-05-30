@@ -1,12 +1,12 @@
 const pool = require("../pool");
 
-async function createJournalProblem({title, code, notes}) {
+async function createJournalProblem({creator_id, is_public, title, code, notes}) {
     try {
         const {rows: [journal]} = await pool.query(`
-           INSERT INTO journal_problems(title, code, notes)
-           VALUES($1, $2)
+           INSERT INTO journal_problems(creator_id, is_public, title, code, notes)
+           VALUES($1, $2, $3, $4, $5)
            RETURNING *;
-        `, [title, code, notes]);
+        `, [creator_id, is_public, title, code, notes]);
         return journal;
     } catch (error) {
         throw error;
@@ -45,6 +45,14 @@ async function getJournalProblemById({journalId}) {
             WHERE id=$1;
         `, [journalId]);
         return journal;
+    } catch (error) {
+        throw error;
+    }
+}
+
+async function getAllPublicJournalProblems() {
+    try {
+
     } catch (error) {
         throw error;
     }
