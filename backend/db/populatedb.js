@@ -10,7 +10,7 @@ async function dropTables(client) {
             DROP TABLE IF EXISTS gpt_conversations;
             DROP TABLE IF EXISTS journal_problems;
             DROP TABLE IF EXISTS users;
-            `);
+        `);
 
         // Log tables were dropped
         console.log("Completed dropping tables...")
@@ -53,6 +53,11 @@ async function initializeTables(client) {
                 response TEXT,
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
+
+            CREATE INDEX idx_journal_creator ON journal_problems(creator_id);
+            CREATE INDEX idx_journal_public ON journal_problems(is_public);
+            CREATE INDEX idx_journal_difficulty ON journal_problems(difficulty);
+            CREATE INDEX idk_conversations_journal ON gpt_conversations(journal_id);
         `);
         console.log("Finished intializing data!");
     } catch (error) {

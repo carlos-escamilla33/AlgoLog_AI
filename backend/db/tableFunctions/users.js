@@ -22,7 +22,7 @@ async function createUser(userData, client) {
     }
 }
 
-async function getAllUsernames() {
+async function getAllUsers() {
     try {
         const { rows } = await pool.query("SELECT * FROM users");
         return rows;
@@ -33,7 +33,7 @@ async function getAllUsernames() {
 
 module.exports = {
     createUser,
-    getAllUsernames
+    getAllUsers
 }
 
 
