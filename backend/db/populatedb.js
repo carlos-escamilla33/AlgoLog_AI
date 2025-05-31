@@ -90,6 +90,60 @@ async function createInitialUsers(client) {
     }
 }
 
+async function createInitialJournals(client, users) {
+    console.log("Creating initial journal entries...");
+    try {
+        const journalsToCreate = [
+            {
+                creator_id: users[0].id,
+                title: "Two Sum",
+                code: ` 
+                def twoSum(nums, target):
+                    hashmap = {}
+                    for i, num in enumerate(nums):
+                        complement = target - num
+                        if complement in hashmap:
+                            return [hashmap[complement], i]
+                        hashmap[num] = i
+                    return []
+                `,
+                notes: "Classic hash map problem. Time:O(n), Space:O(n)",
+                difficulty: "Easy",
+                tags: ["Array", "Hash Table"],
+                is_public: true
+            },
+            {
+                creator_id: users[1].id,
+                title: "Valid Parentheses",
+                code: `
+                def isValid(s):
+                    stack = []
+                    mapping = {")": "(", "}": "{", "]": "["}
+                    
+                    for char in s:
+                        if char in mapping:
+                            if not stack or stack.pop() != mapping[char]:
+                                return False
+                        else:
+                            stack.append(char)
+                    
+                    return not stack`,
+                notes: "Stack based solution. Remember to check if stack is empty before popping!",
+                difficulty: "Easy",
+                tags: ["Stack", "String"],
+                is_public: false
+            }
+        ];
+        for (const entry of entries) {
+            
+        }
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
 async function seed() {
     const client = await pool.connect();
     try {
@@ -102,6 +156,7 @@ async function seed() {
         // Create Users
         const users = await createInitialUsers(client);
         // Create journal
+        await createInitialJournals(client, users);
         // adding COMMIT transaction
         await client.query("COMMIT");
         console.log("✅ Seed completed successfully!");
